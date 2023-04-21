@@ -8,7 +8,7 @@ function fillRect(style, x, y, w, h){
 
 function drawCard(card, team, x, y, width, height){
 
-	if(card.image != -1){
+	if(card.image != null){
 		let offsetX = 3;
 		let offsetY = 3;
 		let frameWidth = 186;
@@ -16,11 +16,21 @@ function drawCard(card, team, x, y, width, height){
 		let frameSpacingWidth = 5;
 		let frameSpacingHeight = 6;
 
-		if (team == 0)
-			fillRect('brown', x, y, width, height);
-		else
-			fillRect('blue', x, y, width, height);
+		let gradient = ctx.createLinearGradient(x, y, x, y + height);
 
+		if (team == 0){
+			gradient.addColorStop(0, "pink");
+			gradient.addColorStop(0.7, "red");
+
+		}else{
+			gradient.addColorStop(0, "lightblue");
+			gradient.addColorStop(0.7, "blue");
+		}
+
+		// Draw background
+		fillRect(gradient, x, y, width, height);
+
+		// Draw card
 		ctx.drawImage(assets.images.cards[card.image], 
 			offsetX + card.x * (frameWidth + frameSpacingWidth), 
 			offsetY + card.y * (frameHeight + frameSpacingHeight), 
@@ -30,6 +40,72 @@ function drawCard(card, team, x, y, width, height){
 			y, 
 			width, 
 			height);
+
+		// Draw Element
+		let drawElement = true;
+
+		switch(card.type){
+
+			case "FIRE":
+				offsetX = 0;
+				offsetY = 32;
+				break;
+
+			case "ICE":
+				offsetX = 256;
+				offsetY = 32;
+				break;
+
+			case "LIGHTNING":
+				offsetX = 512;
+				offsetY = 32;
+				break;
+
+			case "EARTH":
+				offsetX = 0;
+				offsetY = 96;
+				break;
+
+			case "WIND":
+				offsetX = 256;
+				offsetY = 96;
+				break;
+
+			case "WATER":
+				offsetX = 512;
+				offsetY = 96;
+				break;
+
+			case "HOLY":
+				offsetX = 0;
+				offsetY = 160;
+				break;
+
+			case "POISON":
+				offsetX = 256;
+				offsetY = 160;
+				break;
+
+			default:
+				drawElement = false;
+				break;
+		}
+
+		if(drawElement){
+			//let frame = Math.floor((Date.now() % 500) / 125);
+
+			ctx.drawImage(
+				assets.images.text[0],
+				offsetX, 
+				offsetY, 
+				64, 
+				64,
+				x + width-56, 
+				y - 8,
+				64,
+				64
+				);
+		}
 
 		// Draw Number Identifiers on cards
 		ctx.drawImage(assets.images.text[0],
