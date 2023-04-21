@@ -25,6 +25,21 @@ canvas.addEventListener('mouseup', (event) => {
 	game.input.mouse.click = false;
 });
 
+canvas.addEventListener('touchmove', (event) => {
+	game.input.mouse.x = event.touches[0].clientX;
+	game.input.mouse.y = event.touches[0].clientY;
+	console.log(game.input.mouse);
+});
+
+canvas.addEventListener('touchstart', (event) => {
+	game.input.mouse.click = true;	
+});
+
+canvas.addEventListener('touchend', (event) => {
+	game.input.mouse.click = false;
+});
+
+
 function onopen(){
 	const params = new URLSearchParams(location.search);
 	let code = params.get("code");
@@ -158,10 +173,41 @@ function gameLoop(){
 		drawCard(card, game.team, game.input.mouse.x - width/2, game.input.mouse.y - height/2, width, height);		
 	}
 
-	if (game.action == 'loss')
-		drawLoser();
-	if (game.action == 'win')
-		drawWinner();
+	switch(game.action){
+
+		case "spectating":
+			ctx.font = "32px sans-serif";
+			ctx.fillStyle = "lightgrey";
+			ctx.fillText("Spectating", 0, 32);
+			break;			
+
+		case "waiting-for-players":
+			ctx.font = "32px sans-serif";
+			ctx.fillStyle = "lightgrey";
+			ctx.fillText("Waiting for Players to Join...", 0, 32);
+			break;
+
+		case "waiting":
+			ctx.font = "32px sans-serif";
+			ctx.fillStyle = "lightgrey";
+			ctx.fillText("Waiting for Opponents Move...", 0, 32);
+			break;
+
+		case "turn":
+			ctx.font = "32px sans-serif";
+			ctx.fillStyle = "lightgrey";
+			ctx.fillText("Your Turn!", 0, 32);
+			break;
+
+		case "win":
+			drawWinner();
+			break;
+
+		case "loss":
+			drawLoser();
+			break;
+	}	
+		
 
 	// Update status of the game on a 3 second interval
 	if(Date.now() - time > 3000){
