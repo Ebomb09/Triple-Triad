@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}View Games{% endblock %}
+
+{% block body %}
+<table>
+	<thead>
+		<tr>
+			<th> Code </th>
+			<th> Players </th>
+		</tr>
+	</thead>
+
+	<tbody id="loaded-games">
+	</tbody>
+</table>
+
+<button onclick="client.getGames()"> Refresh </button>
+<button onclick="client.createGame()"> Create Game </button>
+{% endblock %}
+
+{% block scripts %}
+<script src="static/js/index.js"></script>
+{% endblock %}

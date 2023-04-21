@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title> {% block title %}{% endblock %} </title>
+</head>
+
+<body>	
+	{% block body %}
+	{% endblock %}
+
+	<script src="static/js/load-content.js"></script>
+	<script src="static/js/draw.js"></script>
+	<script src="static/js/tt-client.js"></script>
+	{% block scripts %}{% endblock %}
+
+	<footer>
+		Created by Ethan Bryson 2023
+	</footer>
+</body>
+
+</html>
