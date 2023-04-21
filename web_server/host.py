@@ -19,10 +19,10 @@ app = web.application(urls, globals())
 class index:
 
 	def GET(self):
-		return render.index()
+		return render.index(url=web.ctx.host)
 
 
 class join:
 
 	def GET(self):
-		return render.join()
+		return render.join(url=web.ctx.host)
