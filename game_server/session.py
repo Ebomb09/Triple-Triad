@@ -144,6 +144,10 @@ class session:
 
 	def get_placed(self, x, y):
 
+		# Stops looping backwards on board
+		if x < 0 or y < 0:
+			return None
+
 		try:
 			return self.board[x][y]
 		except IndexError:
