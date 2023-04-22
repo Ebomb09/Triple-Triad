@@ -1,10 +1,11 @@
-let client = new tt_client(url, onopen);
+let client = new tt_client(url, onOpen);
 let time = Date.now();
 
 const game = {
 	action: "none",
-	team: -1,
-	cards: [],
+
+	players: [ { name: "", team: -1, hand: [] }, ],
+
 	board: [],
 
 	input: {
@@ -12,6 +13,9 @@ const game = {
 	}
 };
 
+/*
+	Input Event Listeners
+*/
 canvas.addEventListener('mousemove', (event) => {
 	game.input.mouse.x = event.offsetX;
 	game.input.mouse.y = event.offsetY;
@@ -40,27 +44,23 @@ canvas.addEventListener('touchend', (event) => {
 });
 
 
-function onopen(){
+function onOpen(){
 	const params = new URLSearchParams(location.search);
 	let code = params.get("code");
 	let name = prompt("Enter your name");
-	client.joinGame(code, name);
-	gameLoop();
+	client.joinGame(code, name, gameLoop);
 }
 
-function onstatus(){
+function onStatus(status){
 
-	if(client.status.action !== undefined)
-		game.action = client.status.action;	
+	if(status.action !== undefined)
+		game.action = status.action;	
 
-	if(client.status.team !== undefined)
-		game.team = client.status.team;
+	if(status.players !== undefined)
+		game.players = status.players;
 
-	if(client.status.cards !== undefined)
-		game.cards = client.status.cards;
-
-	if(client.status.board !== undefined)
-		game.board = client.status.board;
+	if(status.board !== undefined)
+		game.board = status.board;
 }
 
 function inRect(pos, rect){
@@ -84,7 +84,10 @@ function gameLoop(){
 			time = Date.now();
 
 	// Draw game board
-	{
+	if(game.players.length == 2){
+		let self = game.players[0];
+		let other = game.players[1];
+
 		let offsetX = 200;
 		let offsetY = 40;
 		let width = 133;
@@ -121,25 +124,22 @@ function gameLoop(){
 		if(!game.input.mouse.click){
 
 			if(selection.x != -1){
-				client.updateGame(game.input.mouse.selected, selection.x, selection.y);
-				game.board[selection.x][selection.y].card = game.cards[game.input.mouse.selected];
-				game.cards.splice(game.input.mouse.selected, 1);
+				client.updateGame(game.input.mouse.selected, selection.x, selection.y, onStatus);
+				game.board[selection.x][selection.y].card = self.hand[game.input.mouse.selected];
+				self.hand.splice(game.input.mouse.selected, 1);
 			}
 			game.input.mouse.selected = -1;
 		}
-	}
 
-	// Draw hand
-	{
-		let offsetX = 633;
-		let offsetY = 40; 
-		let width = 133;
-		let height = 173;
+		// Draw hand
+		offsetX = 633;
+		offsetY = 40; 
+		width = 133;
+		height = 173;
 
-		let cards = game.cards;
-		let selection = -1;
+		selection = -1;
 
-		for(let i = 0; i < cards.length; i ++){
+		for(let i = 0; i < self.hand.length; i ++){
 			let rect = {
 				x: offsetX,
 				y: offsetY + i * height / 2,
@@ -148,7 +148,7 @@ function gameLoop(){
 			};
 
 			if(game.input.mouse.selected != i)
-				drawCard(cards[i], game.team, rect.x, rect.y, rect.w, rect.h);
+				drawCard(self.hand[i], self.team, rect.x, rect.y, rect.w, rect.h);
 
 			// Check if mouse is trying to select a card
 			if(game.input.mouse.selected == -1){
@@ -161,18 +161,20 @@ function gameLoop(){
 		// Make selection from hand
 		if (game.input.mouse.click && selection != -1)
 			game.input.mouse.selected = selection;
+	
+
+		// Draw selected card
+		if (game.input.mouse.selected != -1){
+			let width = 133;
+			let height = 173;
+
+			let card = self.hand[game.input.mouse.selected];
+
+			drawCard(card, self.team, game.input.mouse.x - width/2, game.input.mouse.y - height/2, width, height);		
+		}
 	}
 
-	// Draw selected card
-	if (game.input.mouse.selected != -1){
-		let width = 133;
-		let height = 173;
-
-		let card = game.cards[game.input.mouse.selected];
-
-		drawCard(card, game.team, game.input.mouse.x - width/2, game.input.mouse.y - height/2, width, height);		
-	}
-
+	// Display what the player can do 
 	switch(game.action){
 
 		case "spectating":
@@ -212,7 +214,7 @@ function gameLoop(){
 	// Update status of the game on a 3 second interval
 	if(Date.now() - time > 3000){
 		time = Date.now();
-		client.statusGame(onstatus);
+		client.statusGame(onStatus);
 	}
 
 	requestAnimationFrame(gameLoop);

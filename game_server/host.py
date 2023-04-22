@@ -72,13 +72,7 @@ class host:
 				self.leave_game(client)
 
 			elif method == 'list-games':
-				results = []
-
-				with self.session_lock:		
-					for game in self.session_list:
-						results.append({'code': game.code, 'players': len(game.players)})
-
-				send(ws, {'response': 'list-games', 'games': results})
+				send(ws, {'response': 'list-games', 'games': self.list_games()})
 
 			elif method == 'create-game':
 				max_cards = data.get('max-cards', 5)
@@ -89,11 +83,11 @@ class host:
 				code = data.get('code')
 				name = data.get('name')
 				self.join_game(client, name, code)
-				send(ws, self.status_game(client, code))
+				send(ws, {'response': 'join-game', 'code': code})
 
 			elif method == 'status-game':
 				code = data.get('code')
-				send(ws, self.status_game(client, code))
+				send(ws, {'response': 'status-game', 'status': self.status_game(client, code)})
 
 			elif method == 'update-game':
 				code = data.get('code')
@@ -101,7 +95,17 @@ class host:
 				x = data.get('x');
 				y = data.get('y');
 				self.update_game(client, code, card, x, y)
-				send(ws, self.status_game(client, code))
+				send(ws, {'response': 'update-game', 'status': self.status_game(client, code)})
+
+
+	def list_games(self):
+		results = []
+
+		with self.session_lock:		
+			for game in self.session_list:
+				results.append({'code': game.code, 'players': len(game.players)})
+
+		return results
 
 
 	def create_game(self, max_cards):
@@ -121,6 +125,9 @@ class host:
 			for game in self.session_list:
 				if game.code == code:
 					game.add_user(client, name)
+					return True
+
+		return False
 
 
 	def leave_game(self, client):
@@ -128,11 +135,13 @@ class host:
 		# Attempt to remove from every session
 		with self.session_lock:
 			for game in self.session_list:
-				game.remove_user(client)
 
-				# Somebody tried to connect at least once and everyone is gone
-				if game.connect_attempts > 0 and len(game.players) == 0:
-					self.session_list.remove(game)
+				# Delete when last active member of session leaves
+				if len(game.connections) > 0:
+					game.remove_user(client)
+
+					if len(game.connections) == 0:
+						self.session_list.remove(game)
 
 
 	def status_game(self, client, code):
@@ -144,9 +153,7 @@ class host:
 				if game.code == code:
 					status = game.status(client)
 		
-		response = {'response': 'status-game'}			
-		response.update(status)
-		return response	
+		return status	
 
 
 	def update_game(self, client, code, card, x, y):

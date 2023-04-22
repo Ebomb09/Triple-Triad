@@ -41,5 +41,9 @@ const assets = {
 			loadImage("static/images/text_1.png"),
 			loadImage("static/images/text_2.png")
 			]
-	}
+	},
+
+	music: [
+		new Audio("static/music/Shuffle or Boogie - Final Fantasy VIII.mp4")
+	]
 };

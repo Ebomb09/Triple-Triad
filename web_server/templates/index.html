@@ -14,8 +14,8 @@
 	</tbody>
 </table>
 
-<button onclick="client.getGames()"> Refresh </button>
-<button onclick="client.createGame()"> Create Game </button>
+<button onclick="client.listGames(onListGames)"> Refresh </button>
+<button onclick="client.createGame(onCreateGame)"> Create Game </button>
 {% endblock %}
 
 {% block scripts %}

@@ -13,6 +13,7 @@ class player:
 
 class boardCard:
 
+
 	def __init__(self):
 		self.card = None
 		self.team = None
@@ -24,15 +25,14 @@ class session:
 	def __init__(self, code, cards, max_cards):
 		# Session identification
 		self.code = code
-		self.host = ""
 
 		# Card pool and rule set
 		self.cards = cards
 		self.max_cards = max_cards
 
 		# State control of current game
+		self.connections = []
 		self.players = []
-		self.connect_attempts = 0
 
 		self.board = []
 		for i in range(3):
@@ -42,20 +42,25 @@ class session:
 		self.winner = None
 
 
-	def add_user(self, unique_id, unique_name):
-		self.connect_attempts += 1
+	def add_user(self, unique_id, name):
 
-		for ply in self.players:
-			if ply.id == unique_id:
-				return
+		# Check if already in game
+		for conn in self.connections:
+			if conn.id == unique_id:
+				conn.name = name
 
-		# Add requesting player if there are less than 2 players already
+		ply = player(unique_id, name, -1)
+
+		# Join by default as spectator
+		self.connections.append(ply)
+
+		# Join as a player if there is still room
 		if len(self.players) < 2 and self.turn is None:
-			self.players.append(player(unique_id, unique_name, len(self.players)))
 
-			# Assign host to the first player to successfully join
-			if self.host == "":
-				self.host = unique_name;
+			# Default team to index of player
+			ply.team = len(self.players)
+
+			self.players.append(ply)
 
 			# If the number of players is 2 then start game
 			if len(self.players) == 2:
@@ -64,19 +69,29 @@ class session:
 
 	def remove_user(self, unique_id):
 
-		# Game has already started and player left
+		# Remove from connection list
+		for conn in self.connections:
+			if conn.id == unique_id:
+				self.connections.remove(conn)
+
+		# If not started then can safely remove player
+		if self.turn is None:
+			for ply in self.players:
+				if ply.id == unique_id:		
+					self.players.remove(ply)
+
+		# Game has already started and player forefeit match
 		if self.turn is not None:
-	
 			if self.winner is None:
-				if self.players[0].id == unique_id:
-					self.winner = self.players[1]
 
-				elif self.players[1].id == unique_id:
-					self.winner = self.players[0]
+				for ply in self.players:
+					if ply.id == unique_id:
 
-		for ply in self.players:
-			if ply.id == unique_id:
-				self.players.remove(ply)
+						if self.players[0].id == unique_id:
+							self.winner = self.players[1]
+
+						elif self.players[1].id == unique_id:
+							self.winner = self.players[0]
 
 
 	def start(self):
@@ -187,28 +202,54 @@ class session:
 	# Get status of board and get context per player
 	def status(self, who):
 
-		status = {'action': 'spectating', 'board': self.board}
+		action = 'spectating'
+		board = self.board
+		players = []
 
+		# Check if turn order decided
+		if self.turn is None:
+			action = 'waiting-for-players'
+
+		# Game still in progress
+		if self.turn is not None:
+			if self.turn.id == who:
+				action = 'turn'
+			else:
+				action = 'waiting'
+
+		# Win Conition met
+		if self.winner is not None:
+			if self.winner.id == who:
+				action = 'win'
+			else:
+				action = 'loss'
+
+		# Get status of players
 		for ply in self.players:
+			name = ply.name
+			team = ply.team
+			hand = [None] * len(ply.hand)
+
+			# The person who owns the hand can see the real hand
 			if ply.id == who:
+				hand = ply.hand
+				players.insert(0, {
+					'name': name,
+					'team': team,
+					'hand': hand
+					})
 
-				# Win Conition met
-				if self.winner is not None:
-					if self.winner.id == who:
-						status = {'action': 'win', 'team': ply.team, 'cards': ply.hand,'board': self.board}
-					else:
-						status = {'action': 'loss', 'team': ply.team, 'cards': ply.hand,'board': self.board}
-					return status
+			# Disallow view other's hands to prevent spectator cheating
+			else:
+				players.append({
+					'name': name,
+					'team': team,
+					'hand': hand
+					})				
 
-				# Game still in progress
-				if self.turn is not None:
-					if self.turn.id == who:
-						status = {'action': 'turn', 'team': ply.team, 'cards': ply.hand, 'board': self.board}
-					else:
-						status = {'action': 'waiting', 'team': ply.team, 'cards': ply.hand, 'board': self.board}
-					return status
-
-				else:
-					status = {'action': 'waiting-for-players', 'team': ply.team}
-
+		status = {
+			'action': action,
+			'board': board,
+			'players': players
+		}
 		return status

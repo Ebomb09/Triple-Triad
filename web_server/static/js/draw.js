@@ -1,4 +1,8 @@
 const canvas = document.getElementById("draw");
+
+if(canvas == null)
+	throw new Error("Draw canvas was not found!");
+
 const ctx = canvas.getContext("2d");
 
 function fillRect(style, x, y, w, h){
@@ -8,7 +12,7 @@ function fillRect(style, x, y, w, h){
 
 function drawCard(card, team, x, y, width, height){
 
-	if(card.image != null){
+	if(card != null){
 		let offsetX = 3;
 		let offsetY = 3;
 		let frameWidth = 186;
@@ -19,12 +23,12 @@ function drawCard(card, team, x, y, width, height){
 		let gradient = ctx.createLinearGradient(x, y, x, y + height);
 
 		if (team == 0){
-			gradient.addColorStop(0, "pink");
-			gradient.addColorStop(0.7, "red");
+			gradient.addColorStop(0, "rgb(248, 177, 207)");
+			gradient.addColorStop(1, "rgb(141, 47, 63)");
 
 		}else{
-			gradient.addColorStop(0, "lightblue");
-			gradient.addColorStop(0.7, "blue");
+			gradient.addColorStop(0, "rgb(178, 209, 240)");
+			gradient.addColorStop(1, "rgb(54, 69, 138)");
 		}
 
 		// Draw background

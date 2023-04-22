@@ -1,12 +1,13 @@
 class tt_client{
 	#ws;
 	#code;
-	status = {};
-	#status_callback;
+	#callbacks;
 
 	constructor(url, onopen){
 		this.#ws = new WebSocket(url);
 		this.#ws.onopen = onopen;
+
+		this.#callbacks = {};
 
 		// Parse response message
 		this.#ws.onmessage = (event) => {
@@ -14,58 +15,68 @@ class tt_client{
 
 			switch(json.response){
 
-				case "create-game": 
-					location.href = `join?code=${json.code}`
+				case "list-games":
+					this.doCallback("list" ,json.games)
 					break;
 
-				case "list-games":
-					const table = document.getElementById("loaded-games");
-					table.innerHTML = "";
+				case "create-game": 
+					this.doCallback("create", json.code);
+					break;
 
-					json.games.forEach((game) => {
-						table.innerHTML += `
-							<tr>
-								<td> <a href="join?code=${game.code}"> ${game.code} </a> </td>
-								<td> ${game.players} </td>
-							</tr>
-						`;
-					});
+				case "join-game":
+					this.#code = json.code;
+					this.doCallback("join", json.code);
 					break;
 
 				case "status-game":
-					this.status = json;
+					this.doCallback("status", json.status);
+					break;
 
-					if(this.#status_callback !== undefined)
-						this.#status_callback();
+				case "update-game":
+					this.doCallback("update", json.status);
 					break;
 			}		
 		};
 	}
 
 
-	getGames() {
+	doCallback(name, ...args){
+		let callback = this.#callbacks[name];
+
+		// Generic checker to do callback functions
+		if(callback !== undefined)
+			callback(...args);
+
+		this.#callbacks[name] = undefined;
+	}
+
+
+	listGames(callback) {
+		this.#callbacks["list"] = callback;
 		this.#ws.send(JSON.stringify({method: "list-games"}));
 	}
 
 
-	createGame(){
+	createGame(callback){
+		this.#callbacks["create"] = callback;
 		this.#ws.send(JSON.stringify({method: "create-game"}));
 	}
 
 
-	joinGame(code, name){
-		this.#code = code;
+	joinGame(code, name, callback){
+		this.#callbacks["join"] = callback;
 		this.#ws.send(JSON.stringify({method: 'join-game', code: code, name: name}));
 	}
 
 
 	statusGame(callback){
-		this.#status_callback = callback;
+		this.#callbacks["status"] = callback;
 		this.#ws.send(JSON.stringify({method: 'status-game', code: this.#code}));
 	}
 
 
-	updateGame(card, x, y){
+	updateGame(card, x, y, callback){
+		this.#callbacks["update"] = callback;
 		this.#ws.send(JSON.stringify({method: 'update-game', code: this.#code, card: card, x: x, y: y}));
 	}
 }
