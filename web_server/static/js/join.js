@@ -17,8 +17,11 @@ const game = {
 	Input Event Listeners
 */
 canvas.addEventListener('mousemove', (event) => {
-	game.input.mouse.x = event.offsetX / ctx.scaleX;
-	game.input.mouse.y = event.offsetY / ctx.scaleY;
+	let offsetLeft = (canvas.getBoundingClientRect().width - canvas.width) / 2;
+	let offsetTop = (canvas.getBoundingClientRect().height - canvas.height) / 2;
+
+	game.input.mouse.x = (event.offsetX - offsetLeft) / ctx.scaleX;
+	game.input.mouse.y = (event.offsetY - offsetTop) / ctx.scaleY;
 });
 
 canvas.addEventListener('mousedown', (event) => {
@@ -60,6 +63,10 @@ function onStatus(status){
 
 	if(status.board !== undefined)
 		game.board = status.board;
+}
+
+function copyCode(){
+	navigator.clipboard.writeText(location.toString());
 }
 
 function inRect(pos, rect){

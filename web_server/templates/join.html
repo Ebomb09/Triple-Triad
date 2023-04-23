@@ -3,11 +3,19 @@
 {% block title %} Play {% endblock %}
 
 {% block content %}
+<h3> Play Game </h3>
+
 <div class="text-center">
 	<canvas id="draw"> 
 		Your browser does not support canvas element.
 	</canvas>
 </div>
+
+<hr>
+
+<button type="button" class="btn btn-outline-info" onclick="copyCode()"> &#128203; Copy Invite Link </button>
+
+<button type="button" class="btn btn-secondary float-end" onclick="canvas.requestFullscreen()"> &#x26F6; Fullscreen </button>
 {% endblock %}
 
 {% block scripts %}

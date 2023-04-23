@@ -21,6 +21,7 @@ function onResize(){
 	ctx.scale(ctx.scaleX, ctx.scaleY);
 }
 window.addEventListener("resize", onResize);
+window.addEventListener("fullscreenchange", onResize);
 onResize();
 
 function fillRect(style, x, y, w, h){
