@@ -12,10 +12,7 @@ function loadImage(src){
 const assets = {
 
 	images: {
-		background: [
-			loadImage("static/images/back_0.png"),		
-	 		loadImage("static/images/back_1.png"),
-			],
+		background: loadImage("static/images/back.png"),		
 
 		board: loadImage("static/images/board.png"),
 	 

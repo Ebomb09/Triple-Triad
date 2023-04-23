@@ -3,20 +3,45 @@
 {% block title %} View Games {% endblock %}
 
 {% block content %}
-<table>
-	<thead>
-		<tr>
-			<th> Code </th>
-			<th> Players </th>
-		</tr>
-	</thead>
+<h3> View Games </h3>
 
-	<tbody id="loaded-games">
-	</tbody>
+<table class="table">
+  <thead>
+    <tr>
+      <th> Code </th>
+      <th> Players </th>
+      <th> Spectators </th>
+    </tr>
+  </thead>
+
+  <tbody id="loaded-games">
+  </tbody>
 </table>
 
-<button onclick="client.listGames(onListGames)"> Refresh </button>
-<button onclick="client.createGame(onCreateGame)"> Create Game </button>
+<button type="button" class="btn btn-primary" onclick="client.listGames(onListGames)"> &circlearrowright; Refresh </button>
+
+<button type="button" class="btn btn-primary" onclick="client.createGame(onCreateGame)"> Create Game </button>
+
+<a class="btn btn-secondary" data-bs-toggle="offcanvas" href="#settings" role="button" aria-controls="settings">
+  Settings
+</a>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="settings">
+
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">Settngs</h5>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+
+  <div class="offcanvas-body">
+    <label for="input-name" class="form-label"> Player Name </label>
+    <input type="text" id="input-name" class="form-control">
+
+    <button type="button" class="btn btn-primary mt-5 mb-2" onclick="onSettingsUpdate()"> Save </button>
+
+    <div id="settings-alert"></div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}

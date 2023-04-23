@@ -17,8 +17,8 @@ const game = {
 	Input Event Listeners
 */
 canvas.addEventListener('mousemove', (event) => {
-	game.input.mouse.x = event.offsetX;
-	game.input.mouse.y = event.offsetY;
+	game.input.mouse.x = event.offsetX / ctx.scaleX;
+	game.input.mouse.y = event.offsetY / ctx.scaleY;
 });
 
 canvas.addEventListener('mousedown', (event) => {
@@ -30,9 +30,8 @@ canvas.addEventListener('mouseup', (event) => {
 });
 
 canvas.addEventListener('touchmove', (event) => {
-	game.input.mouse.x = event.touches[0].clientX;
-	game.input.mouse.y = event.touches[0].clientY;
-	console.log(game.input.mouse);
+	game.input.mouse.x = event.touches[0].clientX / ctx.scaleX;
+	game.input.mouse.y = event.touches[0].clientY / ctx.scaleY;
 });
 
 canvas.addEventListener('touchstart', (event) => {
@@ -47,7 +46,7 @@ canvas.addEventListener('touchend', (event) => {
 function onOpen(){
 	const params = new URLSearchParams(location.search);
 	let code = params.get("code");
-	let name = prompt("Enter your name");
+	let name = getCookie("name", "New Player");
 	client.joinGame(code, name, gameLoop);
 }
 
@@ -176,6 +175,12 @@ function gameLoop(){
 
 	// Display what the player can do 
 	switch(game.action){
+
+		case 'fail':
+			ctx.font = "32px sans-serif";
+			ctx.fillStyle = "lightgrey";
+			ctx.fillText("No Game Found", 0, 32);
+			break;
 
 		case "spectating":
 			ctx.font = "32px sans-serif";

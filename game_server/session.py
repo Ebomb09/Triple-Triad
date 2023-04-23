@@ -199,30 +199,45 @@ class session:
 			self.turn = self.players[index]
 
 
+	# Count non players connected to session
+	def count_spectators(self):
+		count = 0
+
+		for conn in self.connections:
+			if conn not in self.players:	
+				count += 1
+
+		return count
+
+
 	# Get status of board and get context per player
-	def status(self, who):
+	def status(self, who = -1):
 
 		action = 'spectating'
 		board = self.board
 		players = []
 
-		# Check if turn order decided
-		if self.turn is None:
-			action = 'waiting-for-players'
+		# PLayer only actions
+		for ply in self.players:
+			if ply.id == who:
+				
+				# Check if turn order decided
+				if self.turn is None:
+					action = 'waiting-for-players'
 
-		# Game still in progress
-		if self.turn is not None:
-			if self.turn.id == who:
-				action = 'turn'
-			else:
-				action = 'waiting'
+				# Game still in progress
+				if self.turn is not None:
+					if self.turn.id == who:
+						action = 'turn'
+					else:
+						action = 'waiting'
 
-		# Win Conition met
-		if self.winner is not None:
-			if self.winner.id == who:
-				action = 'win'
-			else:
-				action = 'loss'
+				# Win Conition met
+				if self.winner is not None:
+					if self.winner.id == who:
+						action = 'win'
+					else:
+						action = 'loss'
 
 		# Get status of players
 		for ply in self.players:

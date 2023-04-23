@@ -103,7 +103,7 @@ class host:
 
 		with self.session_lock:		
 			for game in self.session_list:
-				results.append({'code': game.code, 'players': len(game.players)})
+				results.append({'code': game.code, 'players': game.status()['players'], 'spectators': game.count_spectators()})
 
 		return results
 

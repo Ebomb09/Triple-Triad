@@ -5,6 +5,19 @@ if(canvas == null)
 
 const ctx = canvas.getContext("2d");
 
+// Set size of canvas to the page
+function onResize(){
+	canvas.width = canvas.parentElement.clientWidth;
+	canvas.height = canvas.width * 3/4;
+
+	ctx.scaleX = (canvas.width) / 800;
+	ctx.scaleY = (canvas.height) / 600;
+
+	ctx.scale(ctx.scaleX, ctx.scaleY);
+}
+window.addEventListener("resize", onResize);
+onResize();
+
 function fillRect(style, x, y, w, h){
 	ctx.fillStyle = style;
 	ctx.fillRect(x, y, w, h);
