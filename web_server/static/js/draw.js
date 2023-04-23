@@ -10,6 +10,11 @@ function onResize(){
 	canvas.width = canvas.parentElement.clientWidth;
 	canvas.height = canvas.width * 3/4;
 
+	if(canvas.height > window.innerHeight){
+		canvas.height = window.innerHeight;	
+		canvas.width = canvas.height * 4/3;
+	}
+
 	ctx.scaleX = (canvas.width) / 800;
 	ctx.scaleY = (canvas.height) / 600;
 
