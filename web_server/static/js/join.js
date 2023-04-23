@@ -30,8 +30,8 @@ canvas.addEventListener('mouseup', (event) => {
 });
 
 canvas.addEventListener('touchmove', (event) => {
-	game.input.mouse.x = event.touches[0].clientX / ctx.scaleX;
-	game.input.mouse.y = event.touches[0].clientY / ctx.scaleY;
+	game.input.mouse.x = (event.touches[0].pageX - canvas.offsetLeft) / ctx.scaleX;
+	game.input.mouse.y = (event.touches[0].pageY - canvas.offsetTop) / ctx.scaleY;
 });
 
 canvas.addEventListener('touchstart', (event) => {
