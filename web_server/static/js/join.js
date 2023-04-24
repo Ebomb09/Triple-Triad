@@ -184,33 +184,23 @@ function gameLoop(){
 	switch(game.action){
 
 		case 'fail':
-			ctx.font = "32px sans-serif";
-			ctx.fillStyle = "lightgrey";
-			ctx.fillText("No Game Found", 0, 32);
+			drawText("No Game Found", 0, 0);
 			break;
 
 		case "spectating":
-			ctx.font = "32px sans-serif";
-			ctx.fillStyle = "lightgrey";
-			ctx.fillText("Spectating", 0, 32);
+			drawText("Spectating", 0, 0);
 			break;			
 
 		case "waiting-for-players":
-			ctx.font = "32px sans-serif";
-			ctx.fillStyle = "lightgrey";
-			ctx.fillText("Waiting for Players to Join...", 0, 32);
+			drawText("Waiting for Players to Join...", 0, 0);
 			break;
 
 		case "waiting":
-			ctx.font = "32px sans-serif";
-			ctx.fillStyle = "lightgrey";
-			ctx.fillText("Waiting for Opponents Move...", 0, 32);
+			drawText("Waiting for Opponents Move...", 0, 0);
 			break;
 
 		case "turn":
-			ctx.font = "32px sans-serif";
-			ctx.fillStyle = "lightgrey";
-			ctx.fillText("Your Turn!", 0, 32);
+			drawText("Your Turn!", 0, 0);
 			break;
 
 		case "win":

@@ -29,6 +29,59 @@ function fillRect(style, x, y, w, h){
 	ctx.fillRect(x, y, w, h);
 }
 
+function drawChar(char, x, y){
+
+	let charInt = char.charCodeAt(0);
+	let position = {x: 0, y: 0};
+
+	if("0" <= char && char <= "9"){
+		position.x = 12 + (charInt - "0".charCodeAt(0));
+		position.y = 0;
+	}
+
+	if("a" <= char && char <= "z"){
+		position.x = 11 + (charInt - "a".charCodeAt(0));
+		position.y = 3;
+	}
+
+	if("A" <= char && char <= "Z"){
+		position.x = 6 + (charInt - "A".charCodeAt(0));
+		position.y = 2;
+	}
+
+	while(position.x >= 22){
+
+		// Progress to next font grid
+		position.x -= 22;
+		position.y += 1;
+
+		// Skip first collumn
+		position.x += 1;
+	}
+
+	ctx.drawImage(
+		assets.images.font,
+		position.x * 96,
+		position.y * 96,
+		96,
+		96,
+		x,
+		y,
+		96 * 1/2,
+		96 * 1/2
+		);
+
+	return assets.images.fontWidths[position.x][position.y] * 1/2;
+}
+
+function drawText(str, x, y){
+
+	for(let i = 0; i < str.length; i ++){
+		let width = drawChar(str[i], x, y);
+		x += width;	
+	}
+}
+
 function drawCard(card, team, x, y, width, height){
 
 	if(card != null){
